@@ -5,13 +5,12 @@ import styled from 'styled-components';
 import Typography from '@components/common/typography';
 import MindMap from './components/mindMap';
 import CardGrid, { CardGridData } from './components/cardGrid';
-import dummyImg from '@assets/dummyImage/dummy.jpeg';
 import { usePolicies } from '@apis/queries/usePolicyQueries';
 
 const generateDummyData = (): CardGridData[] => {
   return Array.from({ length: 9 }, (_, index) => ({
     id: String(index + 1),
-    image: dummyImg,
+    image: 'https://i.pinimg.com/736x/af/a0/76/afa07695334ef42a7864f09a0099a679.jpg',
     text: `더미 데이터 ${index + 1}`,
     likes: Math.floor(Math.random() * 2000) + 1000,
     bookmarks: Math.floor(Math.random() * 2000) + 1000,

@@ -2,7 +2,6 @@ import React from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import CardInfo from '@components/Card/CardInfo';
-import dummyImg from '@assets/dummyImage/dummy.jpeg';
 
 export interface PolicyData {
   id: number;
@@ -34,7 +33,7 @@ const transformPolicies = (policies: PolicyData[] | undefined): CardGridData[] =
   if (!policies) return [];
   return policies.map((policy) => ({
     id: policy.id.toString(),
-    image: policy.imageUrl || dummyImg, // 이미지 없을 경우 기본값
+    image: policy.imageUrl || 'https://i.pinimg.com/736x/af/a0/76/afa07695334ef42a7864f09a0099a679.jpg', // 이미지 없을 경우 기본값
     text: policy.title,
     likes: policy.likeCount ?? 0, // undefined 방지
     bookmarks: policy.bookmarkCount ?? 0, // undefined 방지

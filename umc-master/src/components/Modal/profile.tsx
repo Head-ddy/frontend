@@ -14,16 +14,17 @@ import { getUsers } from '@apis/profileApi';
 interface ProfileModalProps {
   isOpen: boolean;
   onClose: () => void;
+  profileImage: string;
 }
 
-const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
+const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, profileImage }) => {
   if (!isOpen) return null;
   const navigate = useNavigate();
   const { clearAuth } = useAuthStore();
   const { user, fetchUser } = useUserStore();
 
   useEffect(() => {
-    fetchUser(); // 컴포넌트 마운트 시 사용자 정보 가져오기
+    fetchUser();
   }, []);
   getUsers();
 
@@ -39,7 +40,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
           <CloseIcon />
         </CloseButton>
         <ProfileWrapper>
-          <ProfileImage />
+          <ProfileImage src={profileImage} alt="Profile Image" />
           <Typography variant="titleXSmall">{user?.nickname} 님</Typography>
         </ProfileWrapper>
         <MenuList>
@@ -109,7 +110,7 @@ const ProfileWrapper = styled.div`
   padding: 20px 0;
 `;
 
-const ProfileImage = styled.div`
+const ProfileImage = styled.img`
   width: 60px;
   height: 60px;
   border-radius: 50%;
@@ -138,7 +139,6 @@ const MenuItem = styled.li`
   }
 `;
 
-// "마이페이지" 링크 전용 컴포넌트
 const MenuItemLink = styled(Link)`
   display: flex;
   align-items: center;

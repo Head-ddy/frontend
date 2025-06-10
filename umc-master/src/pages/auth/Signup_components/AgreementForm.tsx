@@ -3,7 +3,7 @@ import Typography from "@components/common/typography";
 import styled, { useTheme } from "styled-components";
 import ImgAdd from "@assets/add.svg";
 import ImgRemove from "@assets/remove.svg";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 interface AgreementItemProps {
   isRequired: boolean;  // 필수 여부
@@ -67,10 +67,14 @@ const AgreementForm: React.FC<Section1Props> = ({ onCheckRequired }) => {
   });
 
   // 전체 동의 체크박스
-  const handleAllAgreeChange = (checked: boolean) => {
-    setIsAllAgreed(checked);
+  const handleAllAgreeChange = () => {
+    const newCheckedState = !isAllAgreed;
+    setIsAllAgreed(newCheckedState);
     const updatedItems = {
-      terms: checked, privacy: checked, thirdinfo: checked, marketing: checked,
+      terms: newCheckedState, 
+      privacy: newCheckedState, 
+      thirdinfo: newCheckedState, 
+      marketing: newCheckedState, 
     };
     setCheckedItems(updatedItems);
     onCheckRequired(updatedItems.terms && updatedItems.privacy);
@@ -79,21 +83,12 @@ const AgreementForm: React.FC<Section1Props> = ({ onCheckRequired }) => {
   const handleCheckboxChange = (key: string, checked: boolean) => {
     setCheckedItems((prevState) => {
       const updatedItems = { ...prevState, [key]: checked };
+      const allChecked = Object.values(updatedItems).every(Boolean);
+      setIsAllAgreed(allChecked);
       onCheckRequired(updatedItems.terms && updatedItems.privacy);
       return updatedItems;
     });
   };
-
-  useEffect(() => {
-    if (isAllAgreed) {
-      setCheckedItems({
-        terms: true, privacy: true, thirdinfo: true, marketing: true,
-      });
-      onCheckRequired(true);
-    } else {
-      onCheckRequired(checkedItems.terms && checkedItems.privacy);
-    }
-  }, [isAllAgreed, checkedItems, onCheckRequired]);
 
   return (
     <Container>

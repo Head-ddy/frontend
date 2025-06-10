@@ -43,15 +43,17 @@ const handleNicknameChange = (nickname: string) => {
 };
 
 const handleHashtagChange = (hashtags: string[]) => {
-  setHashtag(hashtags);
+  const hashtagStrings = hashtags.map(hashtag => hashtag.toString());
+  setHashtag(hashtagStrings);
 };
 
 const handleSignUpComplete = async () => {
   try {
     const userSignupData = { email, password, nickname, hashtags };
     console.log("회원가입 확인:", userSignupData)
-    await postSignup();
-    navigate("/main");
+    await postSignup(userSignupData);
+    alert("회원가입 성공!");
+    navigate("/login");
   } catch (error) {
     console.error("회원가입 오류:", error);
     alert("회원가입에 실패했습니다. 다시 시도해주세요.");

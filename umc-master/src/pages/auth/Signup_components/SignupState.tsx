@@ -28,7 +28,8 @@ const SignupState: React.FC<SignupStateProps> = ({ sectionCount }) => {
             <Typography
               variant={sectionCount === index ? "titleXxSmall" : "bodyMedium"}
               style={{
-                color: sectionCount === index ? theme.colors.primary[800] : theme.colors.text.lightGray
+                color: sectionCount === index ? theme.colors.primary[800] : theme.colors.text.lightGray, 
+                whiteSpace: "nowrap"
               }}
             >
               {step}
@@ -51,7 +52,7 @@ const Sequence = styled.div`
   position: relative;
   display: flex;
   align-items: center;
-  gap: 160px;
+  gap: 130px;
 `
 
 const Step = styled.div`
@@ -85,7 +86,7 @@ const Num = styled.div<{ isActive: boolean }>`
 const Line = styled.div`
   position: absolute;
   top: 30px;
-  left: 5px;
+  left: 15px;
   width: 99%;
   height: 1px;
   border: 1px dotted ${({ theme }) => theme.colors.text.lightGray};

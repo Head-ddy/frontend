@@ -80,8 +80,8 @@ const SaveTipPage: React.FC = () => {
                         : placeholderImg
                     }
                     text={item.title}
-                    likes={item.likes ?? 0}
-                    bookmarks={item.bookmarks ?? 0}
+                    likes={item.likeCount ?? 0}
+                    bookmarks={item.saveCount ?? 0}
                     date={item.createdAt.slice(0, 10)}
                     onClick={() => handleCardClick(item.tipId)}
                   />

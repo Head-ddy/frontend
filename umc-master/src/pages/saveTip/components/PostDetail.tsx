@@ -45,7 +45,19 @@ const PostDetail: React.FC<PostDetailProps> = ({ detail }) => {
 
   return (
     <PostView>
-      {detail.media.length > 0 && <Img src={detail.media[0].mediaUrl} alt="게시물 이미지" />}
+      {detail.media.length > 0 && (
+        <ImageGrid count={detail.media.length}>
+          {detail.media.map((item, index) => (
+            <ImageItem
+              key={index}
+              index={index}
+              count={detail.media.length}
+              src={item.mediaUrl}
+              alt={`이미지 ${index + 1}`}
+            />
+          ))}
+        </ImageGrid>
+      )}
       <Typography variant="headingXxSmall" style={{ color: theme.colors.primary[900] }}>
         {detail.title}
       </Typography>
@@ -98,14 +110,78 @@ const PostView = styled.div`
   align-self: stretch;
 `;
 
-const Img = styled.img`
+const ImageGrid = styled.div<{ count: number }>`
+  display: grid;
   width: 80vw;
-  height: 360px;
-  border-radius: 20px;
-  object-fit: cover;
-  background: #d9d9d9;
+  gap: 10px;
+
+  ${({ count }) =>
+    count === 1
+      ? `grid-template-columns: 1fr;
+       grid-auto-rows: 360px;`
+      : count === 2
+        ? `grid-template-columns: 1fr 1fr;
+        grid-auto-rows: 360px;`
+        : count === 3
+          ? `grid-template-columns: repeat(3, 1fr);`
+          : count === 4
+            ? `
+              grid-template-columns: 1fr 1fr 1fr;
+              grid-template-rows: auto auto;
+              grid-template-areas: 
+                "left top right"
+                "left bottom right";
+            `
+            : count === 5
+              ? `
+              display: grid;
+              grid-template-columns: 1fr 1fr 1fr;
+              & > :nth-child(4), & > :nth-child(5) {
+                grid-column: span 1;
+              }
+            `
+              : `grid-template-columns: repeat(3, 1fr);`}
+
+  grid-auto-rows: minmax(180px, auto);
 `;
 
+const ImageItem = styled.img<{ index: number; count: number }>`
+  width: 100%;
+  border-radius: 20px;
+  object-fit: cover;
+
+  ${({ count, index }) =>
+    count === 1
+      ? `height: 360px;`
+      : count === 4
+        ? index === 0
+          ? `grid-area: left; grid-row: span 2; height: 360px;`
+          : index === 1
+            ? `grid-area: top; height: 175px;`
+            : index === 2
+              ? `grid-area: bottom; height: 175px;`
+              : index === 3
+                ? `grid-area: right; grid-row: span 2; height: 360px;`
+                : ''
+        : // TODO: 수정
+          // count === 5
+          // ? index === 0
+          //   ? `grid-area: left; grid-row: span 2; height: 360px;`
+          //   : index === 1
+          //     ? `grid-area: top; height: 175px;`
+          //     : index === 2
+          //       ? `grid-area: bottom-left; grid-column: span 1; height: 175px;`
+          //       : index === 3
+          //         ? `grid-area: bottom-right; grid-column: span 1; height: 175px;`
+          //         : index === 4
+          //           ? `grid-area: right; grid-row: span 2; height: 360px;`
+          //           : ''
+          count === 5
+          ? index < 3
+            ? `grid-column: span 1; height: 360px;`
+            : `grid-column: span 2; height: 360px;`
+          : `aspect-ratio: 16/9;`}
+`;
 const PostInfo = styled.div`
   display: flex;
   justify-content: space-between;

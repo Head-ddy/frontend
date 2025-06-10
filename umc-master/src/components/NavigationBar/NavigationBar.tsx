@@ -26,6 +26,10 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ login }) => {
   }, []);
   getUsers();
 
+  const handleNavClick = () => {
+    window.scrollTo(0, 0);
+  };
+
   const toggleAlarmModal = () => setIsAlarmModalOpen((prev) => !prev);
   const toggleProfileModal = () => setIsProfileModalOpen((prev) => !prev);
 
@@ -33,15 +37,23 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ login }) => {
     <Container>
       <Nav>
         <LeftSection>
-          <NavLink to={RoutePaths.MAIN}>
+          <NavLink to={RoutePaths.MAIN} onClick={handleNavClick}>
             <Logo src={LogoImage} alt="Logo" />
           </NavLink>
           <Typography variant="titleXxSmall">
             <MenuItems>
-              <StyledNavLink to={RoutePaths.MAGAZINE}>매거진</StyledNavLink>
-              <StyledNavLink to={RoutePaths.COMMUNITY}>꿀팁나눔</StyledNavLink>
-              <StyledNavLink to={RoutePaths.SAVE_TIP}>저장한 꿀팁</StyledNavLink>
-              <StyledNavLink to={RoutePaths.CHALLENGE}>챌린지</StyledNavLink>
+              <StyledNavLink to={RoutePaths.MAGAZINE} onClick={handleNavClick}>
+                매거진
+              </StyledNavLink>
+              <StyledNavLink to={RoutePaths.COMMUNITY} onClick={handleNavClick}>
+                꿀팁나눔
+              </StyledNavLink>
+              <StyledNavLink to={RoutePaths.SAVE_TIP} onClick={handleNavClick}>
+                저장한 꿀팁
+              </StyledNavLink>
+              <StyledNavLink to={RoutePaths.CHALLENGE} onClick={handleNavClick}>
+                챌린지
+              </StyledNavLink>
             </MenuItems>
           </Typography>
         </LeftSection>
@@ -63,7 +75,11 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ login }) => {
       </Nav>
 
       <AlarmModal isOpen={isAlarmModalOpen} onClose={toggleAlarmModal} />
-      <ProfileModal isOpen={isProfileModalOpen} onClose={toggleProfileModal} />
+      <ProfileModal
+        isOpen={isProfileModalOpen}
+        onClose={toggleProfileModal}
+        profileImage={user?.profile_image_url || gray_character}
+      />
     </Container>
   );
 };

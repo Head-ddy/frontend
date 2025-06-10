@@ -12,7 +12,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useSearchList } from '@apis/queries/useSearchList';
 import BigCard from '@components/Card/BigCard';
 import SkeletonBigCard from '@components/Skeleton/SkeletonBigCard';
-
+import { recentStore } from '@store/recentStore';
 interface TipsSectionProps {
   title?: string;
   showArrows?: boolean;
@@ -146,8 +146,11 @@ const TipsSection: React.FC<TipsSectionProps> = ({
 
   if (isError) return <div>Something went wrong...</div>; // 에러 발생 시 표시
 
-  const handleCardClick = (id: number) => {
-    navigate(`/save-tip/${id}`);
+  const { addRecentTip } = recentStore(); // Zustand 상태 가져오기
+
+  const handleCardClick = (tip: TipItem) => {
+    addRecentTip(tip); // 최근 본 팁으로 저장
+    navigate(`/save-tip/${tip.tipId}`); // 상세 페이지로 이동
   };
 
   const handleSlide = (direction: number) => {
@@ -212,7 +215,7 @@ const TipsSection: React.FC<TipsSectionProps> = ({
                         likes={item.likesCount || 0}
                         bookmarks={item.savesCount || 0}
                         date={item.createdAt?.slice(0, 10) || ''}
-                        onClick={() => handleCardClick(item.tipId)}
+                        onClick={() => handleCardClick(item)}
                       />
                     ))}
             </CardsWrapper>

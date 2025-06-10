@@ -38,4 +38,5 @@ const TipCreateBTN = styled.button`
   border-radius: 50px;
   margin-top: 24px;
   color: ${({ theme }) => theme.colors.text['black']};
+  cursor: pointer;
 `;

@@ -16,9 +16,9 @@ const ChallengeHeader: React.FC<ChallengeHeaderProps> = ({
   onSortChange,
 }) => {
   const categories = [
+    { id: 'cleaning', label: '청소' },
     { id: 'season', label: '계절' },
     { id: 'fashion', label: '패션' },
-    { id: 'cleaning', label: '청소' },
     { id: 'cooking', label: '요리/사계절' },
     { id: 'games', label: '게임형/분리하기' },
     { id: 'etc', label: '후기' },

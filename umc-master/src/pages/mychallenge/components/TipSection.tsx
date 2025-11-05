@@ -2,8 +2,8 @@ import { useState, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
 import NumberCard from '@components/Card/NumberCard';
 import SkeletonCard from '@components/Skeleton/SkeletonCard';
-import dummyImage from '@assets/dummyImage/clean.png';
 import { useNavigate } from 'react-router-dom';
+import { dummyImage, dummyText } from '../dummydata';
 
 interface Tip {
   id: number;
@@ -16,15 +16,15 @@ interface Tip {
 }
 
 // 더미 데이터 생성 함수 (필요에 따라 유지)
-const generateDummyData = (count: number, startId: number): Tip[] => {
+const generateDummyData = (count: number, startId: number, images: string[], texts: string[]): Tip[] => {
   return Array.from({ length: count }, (_, index) => {
     const randomDaysAgo = Math.floor(Math.random() * 30);
     const date = new Date();
     date.setDate(date.getDate() - randomDaysAgo);
     return {
       id: startId + index,
-      image: dummyImage,
-      text: `청소메이킹가이드 ${startId + index}`,
+      image: images[Math.floor(Math.random() * images.length)], // 랜덤 이미지
+      text: texts[Math.floor(Math.random() * texts.length)], // 랜덤 텍스트
       likes: Math.floor(Math.random() * 5000),
       bookmarks: Math.floor(Math.random() * 5000),
       date: date.toISOString().slice(0, 10),
@@ -44,7 +44,7 @@ const TipSection = () => {
 
     // 1초 뒤에 더미 데이터를 설정
     const timer = setTimeout(() => {
-      const dummyData = generateDummyData(100, 1);
+      const dummyData = generateDummyData(100, 1, dummyImage, dummyText);
       setAllData(dummyData);
       setIsLoading(false);
     }, 1000);
@@ -83,7 +83,7 @@ const TipSection = () => {
           ))}
         </SkeletonGrid>
       ) : (
-        <NumberCard cards={displayedCards} showNumber={false} onCardClick={handleCardClick}/>
+        <NumberCard cards={displayedCards} showNumber={false} onCardClick={handleCardClick} />
       )}
     </Container>
   );

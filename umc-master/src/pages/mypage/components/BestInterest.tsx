@@ -1,16 +1,12 @@
-/* eslint-disable react/prop-types */
 import { useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import Section from './Section';
 import Typography from '@components/common/typography';
 import Tag from '@components/Tag/Tag';
 import InterestEditModal from '../modal/InterestEditModal';
+import { useUserStore } from '@store/userStore';
 
-interface BestInterestProps {
-    interests: string[];
-}
-
-const dummyCategories = [
+const interestCategories = [
   { section: '계절', tags: ['봄', '여름', '가을', '겨울'] },
   { section: '패션', tags: ['패션', '맨투맨', '니트', '바지', '치마', '블라우스', '자켓'] },
   { section: '청소', tags: ['청소', '방', '정리', '인테리어', '가구', '청소도구'] },
@@ -22,54 +18,57 @@ const dummyCategories = [
   { section: '주거', tags: ['주택', '원룸', '빌라', '아파트', '기숙사'] },
 ];
 
-const BestInterest: React.FC<BestInterestProps> = ({ interests }) => {
-
+const BestInterest: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const { user, updateProfile } = useUserStore();
+  const interests = user?.hashtags || [];
   const theme = useTheme();
+
+  const handleSaveInterests = async (hashtags: string[]) => {
+    await updateProfile({ hashtags });
+    setIsModalOpen(false);
+  };
+
   return (
-      <BestInterestContainer>
-        <Section_1>
-          <Section 
-            title='Best 꿀팁 선정 횟수'
-            content={
-              <>
-                <BestChoice>
-                  <Typography 
-                    variant='headingXxxSmall'
-                    style={{color: theme.colors.text.black}}
-                  >10</Typography>
-                  <Typography 
-                    variant='headingXxxSmall'
-                    style={{color: theme.colors.text.black}}
-                  >회</Typography>
-                </BestChoice>
-              </>
-            }
-          />
-        </Section_1>
-        <Section_2>
-          <Section 
-            title='나의 관심사'
-            content={
-              <>
-                <InterestTagList>
-                  {interests.map((interest, index) => (
-                      <Tag key={index} text={interest} backgroundColor="white"></Tag>
-                  ))}
-                </InterestTagList>
-              </>
-            }
-          />
-          <InterestEdit onClick={() => setIsModalOpen(true)}>편집하기</InterestEdit>
-          <InterestEditModal
-            isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
-            onEdit={() => console.log("Edit")}
-            categories={dummyCategories}
-          />
-        </Section_2>
-      </BestInterestContainer>
+    <BestInterestContainer>
+      <Section_1>
+        <Section
+          title="Best 꿀팁 선정 횟수"
+          content={
+            <BestChoice>
+              <Typography variant="headingXxxSmall" style={{ color: theme.colors.text.black }}>
+                10
+              </Typography>
+              <Typography variant="headingXxxSmall" style={{ color: theme.colors.text.black }}>
+                회
+              </Typography>
+            </BestChoice>
+          }
+        />
+      </Section_1>
+      <Section_2>
+        <Section
+          title="나의 관심사"
+          content={
+            <InterestTagList>
+              {interests.length > 0 ? (
+                interests.map((interest, index) => <Tag key={`${interest}-${index}`} text={interest} backgroundColor="white" />)
+              ) : (
+                <Typography variant="bodySmall">관심사를 선택해 맞춤 꿀팁을 받아보세요.</Typography>
+              )}
+            </InterestTagList>
+          }
+        />
+        <InterestEdit onClick={() => setIsModalOpen(true)}>편집하기</InterestEdit>
+        <InterestEditModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onSave={handleSaveInterests}
+          categories={interestCategories}
+          initialTags={interests}
+        />
+      </Section_2>
+    </BestInterestContainer>
   );
 };
 
@@ -83,7 +82,7 @@ const BestInterestContainer = styled.div`
   justify-content: center;
   align-items: flex-start;
   gap: 28px;
-`
+`;
 
 const Section_1 = styled.div`
   display: flex;
@@ -92,7 +91,7 @@ const Section_1 = styled.div`
   flex-direction: column;
   align-items: flex-end;
   gap: 6px;
-`
+`;
 
 const Section_2 = styled.div`
   position: relative;
@@ -102,12 +101,12 @@ const Section_2 = styled.div`
   flex-direction: column;
   align-items: flex-start;
   gap: 65px;
-`
+`;
 
 const BestChoice = styled.div`
   display: flex;
   align-items: center;
-`
+`;
 
 const InterestTagList = styled.div`
   display: flex;
@@ -115,7 +114,7 @@ const InterestTagList = styled.div`
   align-items: flex-start;
   flex-wrap: wrap;
   gap: 10px;
-`
+`;
 
 const InterestEdit = styled.button`
   position: absolute;
@@ -132,7 +131,7 @@ const InterestEdit = styled.button`
   flex-shrink: 0;
   border-radius: 20px;
   background: ${({ theme }) => theme.colors.primary[500]};
-  color: #FFF;
+  color: #fff;
 
   font-family: ${({ theme }) => theme.fontFamily.medium};
   font-size: ${({ theme }) => theme.typography.title.xxxsmall.size};
@@ -143,4 +142,4 @@ const InterestEdit = styled.button`
   &:hover {
     background: ${({ theme }) => theme.colors.primary[600]};
   }
-`
+`;

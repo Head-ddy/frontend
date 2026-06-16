@@ -1,4 +1,4 @@
-import { prototypeTips } from '@mocks/prototypeData';
+import { getPrototypeTips } from '@mocks/prototypeStorage';
 
 export interface Author {
   userId: number;
@@ -43,9 +43,15 @@ export interface GetTipsParams {
   sort?: 'latest' | 'likes' | 'saves';
 }
 
-export const getSearchTips = async ({ query, tags, page, limit, sort = 'latest' }: GetTipsParams): Promise<TipsResponse> => {
+export const getSearchTips = async ({
+  query,
+  tags,
+  page,
+  limit,
+  sort = 'latest',
+}: GetTipsParams): Promise<TipsResponse> => {
   const normalizedQuery = query?.trim().toLowerCase();
-  const filtered = prototypeTips.filter((tip) => {
+  const filtered = getPrototypeTips().filter((tip) => {
     const matchesQuery = !normalizedQuery || `${tip.title} ${tip.content}`.toLowerCase().includes(normalizedQuery);
     const matchesTags = !tags?.length || tip.hashtags.some((tag) => tags.includes(tag.name));
     return matchesQuery && matchesTags;
@@ -58,5 +64,5 @@ export const getSearchTips = async ({ query, tags, page, limit, sort = 'latest' 
   });
 
   const start = (page - 1) * limit;
-  return { isSuccess: true, message: '프로토타입 검색 결과입니다.', result: sorted.slice(start, start + limit) };
+  return { isSuccess: true, message: '로컬 프로토타입 검색 결과입니다.', result: sorted.slice(start, start + limit) };
 };

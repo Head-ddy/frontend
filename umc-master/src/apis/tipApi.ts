@@ -1,4 +1,13 @@
-import { prototypeTips, prototypeUser } from '@mocks/prototypeData';
+import {
+  addPrototypeTip,
+  getBookmarkedPrototypeTips,
+  getPrototypeTipById,
+  getPrototypeTips,
+  isTipBookmarked,
+  isTipLiked,
+  togglePrototypeBookmark,
+  togglePrototypeLike,
+} from '@mocks/prototypeStorage';
 
 interface GetTipsParams {
   pageParam: number;
@@ -13,10 +22,8 @@ export interface NewPost {
   imageUrls: File[];
 }
 
-let tips = [...prototypeTips];
-
 const sortTips = (sorted: string) =>
-  [...tips].sort((a, b) => {
+  [...getPrototypeTips()].sort((a, b) => {
     if (sorted === 'likes') return b.likesCount - a.likesCount;
     if (sorted === 'saves') return b.savesCount - a.savesCount;
     return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
@@ -36,37 +43,23 @@ export const getTips = async ({ pageParam, sorted }: GetTipsParams) => {
 };
 
 export const createPost = async (newPost: NewPost): Promise<void> => {
-  const now = new Date().toISOString();
-  tips = [
-    {
-      tipId: Date.now(),
-      title: newPost.title,
-      content: newPost.content,
-      createdAt: now,
-      updatedAt: now,
-      hashtags: newPost.hashtags.map((name, index) => ({ hashtagId: index + 100, name })),
-      imageUrls: [],
-      likesCount: 0,
-      savesCount: 0,
-      author: {
-        userId: prototypeUser.user_id,
-        nickname: prototypeUser.nickname,
-        profileImageUrl: prototypeUser.profile_image_url,
-      },
-    },
-    ...tips,
-  ];
+  await addPrototypeTip({
+    title: newPost.title,
+    content: newPost.content,
+    hashtags: newPost.hashtags,
+    imageFiles: newPost.imageUrls,
+  });
 };
 
 export const getSavedTips = async () =>
-  tips.slice(0, 5).map((tip) => ({
+  getBookmarkedPrototypeTips().map((tip) => ({
     ...tip,
     likeCount: tip.likesCount,
     saveCount: tip.savesCount,
   }));
 
 export const getTipDetail = async (tipId: number) => {
-  const tip = tips.find((item) => item.tipId === tipId) || tips[0];
+  const tip = getPrototypeTipById(tipId);
   return {
     tipId: tip.tipId,
     title: tip.title,
@@ -81,17 +74,17 @@ export const getTipDetail = async (tipId: number) => {
     },
     likesCount: tip.likesCount,
     savesCount: tip.savesCount,
-    isLiked: false,
-    isBookmarked: false,
+    isLiked: isTipLiked(tip.tipId),
+    isBookmarked: isTipBookmarked(tip.tipId),
   };
 };
 
-export const toggleLike = async (_tipId: number) => {
-  void _tipId;
-  return { isSuccess: true, message: '프로토타입 좋아요 토글' };
+export const toggleLike = async (tipId: number) => {
+  const liked = togglePrototypeLike(tipId);
+  return { isSuccess: true, message: liked ? '좋아요에 추가했습니다.' : '좋아요를 취소했습니다.' };
 };
 
-export const toggleBookmark = async (_tipId: number) => {
-  void _tipId;
-  return { isSuccess: true, message: '프로토타입 북마크 토글' };
+export const toggleBookmark = async (tipId: number) => {
+  const bookmarked = togglePrototypeBookmark(tipId);
+  return { isSuccess: true, message: bookmarked ? '저장한 꿀팁에 추가했습니다.' : '저장을 취소했습니다.' };
 };

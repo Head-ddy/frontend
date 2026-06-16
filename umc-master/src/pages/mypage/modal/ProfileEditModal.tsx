@@ -1,90 +1,113 @@
 /* eslint-disable react/prop-types */
-import { useState } from "react";
-import styled, { useTheme } from "styled-components";
-import Typography from "@components/common/typography";
-import Input from "@components/Input/Input";
-import { addressOptions, busanDistricts, chungcheongbukDistricts, chungcheongnamDistricts, daeguDistricts, daejeonDistricts, gangwonDistricts, gwangjuDistricts, gyeonggiDistricts, gyeongsangbukDistricts, gyeongsangnamDistricts, incheonDistricts, jejuDistricts, jeollabukDistricts, jeollanamDistricts, sejongDistricts, seoulDistricts } from "../dummyData/region_dummy";
-import Button from "@components/Button/Button";
-import ImgClose from "@assets/close.svg";
+import { useEffect, useState } from 'react';
+import styled, { useTheme } from 'styled-components';
+import Typography from '@components/common/typography';
+import Input from '@components/Input/Input';
+import {
+  addressOptions,
+  busanDistricts,
+  chungcheongbukDistricts,
+  chungcheongnamDistricts,
+  daeguDistricts,
+  daejeonDistricts,
+  gangwonDistricts,
+  gwangjuDistricts,
+  gyeonggiDistricts,
+  gyeongsangbukDistricts,
+  gyeongsangnamDistricts,
+  incheonDistricts,
+  jejuDistricts,
+  jeollabukDistricts,
+  jeollanamDistricts,
+  sejongDistricts,
+  seoulDistricts,
+} from '../dummyData/region_dummy';
+import Button from '@components/Button/Button';
+import ImgClose from '@assets/close.svg';
+import { useUserStore } from '@store/userStore';
+
+interface ProfileUpdateData {
+  nickname?: string;
+  city?: string;
+  district?: string;
+}
 
 interface ProfileEditModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onEdit: () => void;
+  onEdit: (profileData: ProfileUpdateData) => void | Promise<void>;
 }
 
 interface District {
-    value: string;
-    label: string;
+  value: string;
+  label: string;
 }
 
+const districtMap: Record<string, District[]> = {
+  seoul: seoulDistricts,
+  busan: busanDistricts,
+  incheon: incheonDistricts,
+  daegu: daeguDistricts,
+  daejeon: daejeonDistricts,
+  gwangju: gwangjuDistricts,
+  sejong: sejongDistricts,
+  gyeonggi: gyeonggiDistricts,
+  gangwon: gangwonDistricts,
+  chungcheongbuk: chungcheongbukDistricts,
+  chungcheongnam: chungcheongnamDistricts,
+  jeollabuk: jeollabukDistricts,
+  jeollanam: jeollanamDistricts,
+  gyeongsangbuk: gyeongsangbukDistricts,
+  gyeongsangnam: gyeongsangnamDistricts,
+  jeju: jejuDistricts,
+};
+
+const getOptionValueByLabel = (options: { value: string; label: string }[], label?: string | null) =>
+  options.find((option) => option.label === label)?.value || 'default';
+
+const getOptionLabelByValue = (options: { value: string; label: string }[], value: string) =>
+  options.find((option) => option.value === value)?.label || '';
+
 const ProfileEditModal: React.FC<ProfileEditModalProps> = ({ isOpen, onClose, onEdit }) => {
-
-  const [selectedCity, setSelectedCity] = useState<string>("default");
+  const { user } = useUserStore();
+  const [nickname, setNickname] = useState(user?.nickname || '');
+  const [selectedCity, setSelectedCity] = useState<string>('default');
+  const [selectedDistrict, setSelectedDistrict] = useState<string>('default');
   const [districts, setDistricts] = useState<District[]>([]);
+  const theme = useTheme();
 
+  useEffect(() => {
+    if (!isOpen) return;
+    const cityValue = getOptionValueByLabel(addressOptions, user?.city);
+    const nextDistricts = districtMap[cityValue] || [];
+    setNickname(user?.nickname || '');
+    setSelectedCity(cityValue);
+    setDistricts(nextDistricts);
+    setSelectedDistrict(getOptionValueByLabel(nextDistricts, user?.district));
+  }, [isOpen, user?.city, user?.district, user?.nickname]);
 
-  // 도시 선택시 구 목록을 업데이트하는 함수
   const handleCityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const city = e.target.value;
+    const nextDistricts = districtMap[city] || [];
     setSelectedCity(city);
+    setDistricts(nextDistricts);
+    setSelectedDistrict('default');
+  };
 
-    switch (city) {
-        case "seoul":
-            setDistricts(seoulDistricts);
-            break;
-        case "busan":
-            setDistricts(busanDistricts);
-            break;
-        case "incheon":
-            setDistricts(incheonDistricts);
-            break;
-        case "daegu":
-            setDistricts(daeguDistricts);
-            break;
-        case "daejeon":
-            setDistricts(daejeonDistricts);
-            break;
-        case "gwangju":
-            setDistricts(gwangjuDistricts);
-            break;
-        case "sejong":
-            setDistricts(sejongDistricts);
-            break;
-        case "gyeonggi":
-            setDistricts(gyeonggiDistricts);
-            break;
-        case "gangwon":
-            setDistricts(gangwonDistricts);
-            break;
-        case "chungcheongbuk":
-            setDistricts(chungcheongbukDistricts);
-            break;
-        case "chungcheongnam":
-            setDistricts(chungcheongnamDistricts);
-            break;
-        case "jeollabuk":
-            setDistricts(jeollabukDistricts);
-            break;
-        case "jeollanam":
-            setDistricts(jeollanamDistricts);
-            break;
-        case "gyeongsangbuk":
-            setDistricts(gyeongsangbukDistricts);
-            break;
-        case "gyeongsangnam":
-            setDistricts(gyeongsangnamDistricts);
-            break;
-        case "jeju":
-            setDistricts(jejuDistricts);
-            break;
-        default:
-            setDistricts([]);
-            break;
-        }
-      };
+  const handleSubmit = async () => {
+    if (!nickname.trim()) {
+      alert('닉네임을 입력해주세요.');
+      return;
+    }
 
-  const theme = useTheme();
+    await onEdit({
+      nickname: nickname.trim().slice(0, 10),
+      city: getOptionLabelByValue(addressOptions, selectedCity) || user?.city || '',
+      district: getOptionLabelByValue(districts, selectedDistrict) || user?.district || '',
+    });
+    alert('프로필이 로컬 프로토타입에 저장되었습니다.');
+    onClose();
+  };
 
   if (!isOpen) return null;
 
@@ -92,41 +115,52 @@ const ProfileEditModal: React.FC<ProfileEditModalProps> = ({ isOpen, onClose, on
     <ModalOverlay onClick={onClose}>
       <Container onClick={(e) => e.stopPropagation()}>
         <ProfileEditForm>
-          <Close onClick={onClose}><img src={ImgClose} alt="close"/></Close>
-          <Typography 
-            variant="headingXxSmall"
-            style={{color: theme.colors.primary[900]}}
-          >프로필 변경</Typography>
+          <Close onClick={onClose}>
+            <img src={ImgClose} alt="close" />
+          </Close>
+          <Typography variant="headingXxSmall" style={{ color: theme.colors.primary[900] }}>
+            프로필 변경
+          </Typography>
           <PasswordEditForm>
-            <Typography 
-              variant="titleXSmall"
-              style={{color: theme.colors.primary[800]}}
-            >비밀번호 변경</Typography>
-            <Input type={'password'} placeholder={'비밀번호 입력 (숫자, 영문자, 문자 포함 최대 10자 이내)'}/>
-            <Input type={'password'} placeholder={'비밀번호 확인'}/>
+            <Typography variant="titleXSmall" style={{ color: theme.colors.primary[800] }}>
+              비밀번호 변경
+            </Typography>
+            <Typography variant="bodySmall" style={{ color: theme.colors.text.gray }}>
+              서버 없는 프로토타입에서는 비밀번호를 저장하지 않아요.
+            </Typography>
           </PasswordEditForm>
           <InfoEditForm>
             <NameEditForm>
-              <Typography 
-                variant="titleXSmall"
-                style={{color: theme.colors.primary[800]}}
-              >닉네임 변경</Typography>
-              <Input type={'nickname'} placeholder={'닉네임 입력 (10자 이내)'}/>
+              <Typography variant="titleXSmall" style={{ color: theme.colors.primary[800] }}>
+                닉네임 변경
+              </Typography>
+              <Input
+                type="text"
+                placeholder="닉네임 입력 (10자 이내)"
+                maxLength={10}
+                value={nickname}
+                onChange={(event) => setNickname(event.target.value)}
+              />
             </NameEditForm>
             <AddressEditForm>
-              <Typography 
-                variant="titleXSmall"
-                style={{color: theme.colors.primary[800]}}
-              >주소 변경 (선택)</Typography>
+              <Typography variant="titleXSmall" style={{ color: theme.colors.primary[800] }}>
+                주소 변경 (선택)
+              </Typography>
               <Address>
-                <AddressSelect className="box" id="region-list" defaultValue={selectedCity} onChange={handleCityChange}>
+                <AddressSelect className="box" id="region-list" value={selectedCity} onChange={handleCityChange}>
                   {addressOptions.map((option) => (
                     <option key={option.value} value={option.value}>
                       {option.label}
                     </option>
                   ))}
                 </AddressSelect>
-                <AddressSelect className="box" id="seoul-district-list" defaultValue="default">
+                <AddressSelect
+                  className="box"
+                  id="district-list"
+                  value={selectedDistrict}
+                  onChange={(event) => setSelectedDistrict(event.target.value)}
+                >
+                  <option value="default">시/군/구 선택</option>
                   {districts.map((district) => (
                     <option key={district.value} value={district.value}>
                       {district.label}
@@ -136,11 +170,12 @@ const ProfileEditModal: React.FC<ProfileEditModalProps> = ({ isOpen, onClose, on
               </Address>
             </AddressEditForm>
           </InfoEditForm>
-          <Typography 
-            variant="bodyXSmall"
-            style={{color: theme.colors.blue[500]}}
-          >※ 입력하면 해당 지역에서 진행하는 지원 프로그램 정보를 확인 할 수 있습니다.</Typography>
-          <Button variant="profileEdit" onClick={() => {onEdit(); onClose(); }}>프로필 변경 완료</Button>
+          <Typography variant="bodyXSmall" style={{ color: theme.colors.blue[500] }}>
+            ※ 입력한 지역은 매거진/지원 프로그램 화면의 로컬 프로토타입 기준으로 활용됩니다.
+          </Typography>
+          <Button variant="profileEdit" onClick={handleSubmit}>
+            프로필 변경 완료
+          </Button>
         </ProfileEditForm>
       </Container>
     </ModalOverlay>
@@ -150,18 +185,18 @@ const ProfileEditModal: React.FC<ProfileEditModalProps> = ({ isOpen, onClose, on
 export default ProfileEditModal;
 
 const ModalOverlay = styled.div`
-  position: fixed; /* 화면에 고정되도록 설정 */
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);;
+  background-color: rgba(0, 0, 0, 0.5);
   padding: 68px 60px 68px 60px;
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000; /* 모달이 다른 요소 위에 오도록 설정 */
-`
+  z-index: 1000;
+`;
 
 const Container = styled.div`
   display: flex;
@@ -171,8 +206,8 @@ const Container = styled.div`
   align-items: center;
   border-radius: 20px;
   border: 2px solid ${({ theme }) => theme.colors.primary[800]};
-  background: #FFF;
-`
+  background: #fff;
+`;
 
 const Close = styled.button`
   position: absolute;
@@ -181,7 +216,7 @@ const Close = styled.button`
   width: 40px;
   height: 40px;
   cursor: pointer;
-`
+`;
 
 const ProfileEditForm = styled.div`
   position: relative;
@@ -191,7 +226,7 @@ const ProfileEditForm = styled.div`
   align-items: center;
   gap: 40px;
   flex-shrink: 0;
-`
+`;
 
 const PasswordEditForm = styled.div`
   display: flex;
@@ -199,14 +234,14 @@ const PasswordEditForm = styled.div`
   align-items: flex-start;
   gap: 16px;
   align-self: stretch;
-`
+`;
 
 const InfoEditForm = styled.div`
   display: flex;
   align-items: center;
   gap: 26px;
   align-self: stretch;
-`
+`;
 
 const NameEditForm = styled.div`
   display: flex;
@@ -214,21 +249,21 @@ const NameEditForm = styled.div`
   flex-direction: column;
   align-items: flex-start;
   gap: 16px;
-`
+`;
 
 const AddressEditForm = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 16px;
-`
+`;
 
 const Address = styled.div`
   display: flex;
   align-items: center;
   gap: 22px;
   align-self: stretch;
-`
+`;
 
 const AddressSelect = styled.select`
   display: flex;
@@ -241,16 +276,14 @@ const AddressSelect = styled.select`
   gap: 10px;
   border-radius: 20px;
   border: 2px solid ${({ theme }) => theme.colors.text.lightGray};
-  color : ${({ theme }) => theme.colors.text.black};
-  background: #FFF;
+  color: ${({ theme }) => theme.colors.text.black};
+  background: #fff;
 
   font-size: ${({ theme }) => theme.typography.body.small.size};
   font-weight: ${({ theme }) => theme.typography.body.small.weight};
   line-height: ${({ theme }) => theme.typography.body.small.lineHeight};
 
-  appearance: none; /* 기본 드롭다운 화살표 제거 */
-
-  /* 드롭다운 화살표 추가 */
+  appearance: none;
   background-image: url('/src/assets/Dropdown Arrow.svg');
   background-repeat: no-repeat;
   background-position: right 16px center;
@@ -258,7 +291,5 @@ const AddressSelect = styled.select`
 
   & option {
     padding: 8px 12px;
-    background-color: ${({ theme }) => theme.colors.text.white};
-    color: ${({ theme }) => theme.colors.text.black};
   }
-`
+`;

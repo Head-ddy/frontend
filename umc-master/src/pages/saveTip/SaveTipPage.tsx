@@ -42,10 +42,7 @@ const SaveTipPage: React.FC = () => {
   }, [hasNextPage, loadMoreData]);
 
   const handleCardClick = (tipId: number) => {
-    console.log('🖱️ 클릭한 tipId:', tipId);
     const clickedTip = data?.pages.flatMap((page) => page).find((item) => item.tipId === tipId);
-    console.log('🔍 찾은 팁 데이터:', clickedTip);
-
     if (clickedTip) {
       addRecentTip(clickedTip);
     }
@@ -63,14 +60,13 @@ const SaveTipPage: React.FC = () => {
           저장한 꿀팁
         </Typography>
         {data?.pages.length === 0 && !isFetchingNextPage ? (
-          <Typography variant="bodySmall">최근 본 꿀팁이 없습니다.</Typography>
+          <Typography variant="bodySmall">아직 저장한 꿀팁이 없습니다. 상세 화면에서 북마크를 눌러보세요.</Typography>
         ) : (
           <TipCardList>
             {data?.pages
               .flatMap((page) => page)
               .filter(Boolean)
               .map((item) => {
-                console.log('🔍 개별 아이템 확인:', item);
                 return (
                   <Card
                     key={item.tipId}

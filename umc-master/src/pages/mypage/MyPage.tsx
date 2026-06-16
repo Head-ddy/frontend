@@ -1,40 +1,37 @@
-import styled, { useTheme } from "styled-components";
-import ProfileSection from "./components/ProfileSection";
-import RecentTips from "./components/RecentTips";
-import BestInterest from "./components/BestInterest";
-import { dummyInterests } from "./dummyData/dummyData";
-import Typography from "@components/common/typography";
+import styled, { useTheme } from 'styled-components';
+import ProfileSection from './components/ProfileSection';
+import RecentTips from './components/RecentTips';
+import BestInterest from './components/BestInterest';
+import Typography from '@components/common/typography';
 
 const MyPage: React.FC = () => {
+  const theme = useTheme();
+  return (
+    <Container>
+      <MyPageForm>
+        <Typography variant="headingXxSmall" style={{ color: theme.colors.primary[900] }}>
+          마이페이지
+        </Typography>
+        <ProfileSection />
+        <ProfileCard>
+          <RecentTips />
+          <BestInterest />
+        </ProfileCard>
+      </MyPageForm>
+    </Container>
+  );
+};
 
-    const theme = useTheme();
-    return (
-      <Container>
-        <MyPageForm>
-          <Typography 
-            variant="headingXxSmall"
-            style={{color: theme.colors.primary[900]}}
-            >마이페이지</Typography>
-          <ProfileSection/>
-          <ProfileCard>
-            <RecentTips/>
-            <BestInterest interests={dummyInterests}/>
-          </ProfileCard>
-        </MyPageForm>
-      </Container>
-    );
-  };
-  
 export default MyPage;
-  
+
 const Container = styled.div`
   display: flex;
   width: 100%;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: #FFF;
-`
+  background: #fff;
+`;
 
 const MyPageForm = styled.div`
   display: flex;
@@ -53,7 +50,7 @@ const MyPageForm = styled.div`
     gap: 24px;
     padding: 40px 12px 60px;
   }
-`
+`;
 
 const ProfileCard = styled.div`
   display: flex;
@@ -71,4 +68,4 @@ const ProfileCard = styled.div`
     align-items: center;
     gap: 16px;
   }
-`
+`;

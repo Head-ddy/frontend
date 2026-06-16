@@ -4,7 +4,6 @@ import CameraImg from '@assets/icons/cameraImg.svg'
 import { useEffect, useState } from 'react';
 import ProfileEditModal from '../modal/ProfileEditModal';
 import { useUserStore } from '@store/userStore';
-import { getUsers } from '@apis/profileApi';
 import gray_character from '@assets/gray-character.png';
 
 
@@ -15,9 +14,12 @@ const ProfileSection: React.FC = () => {
   const [profileImageUrl, setProfileImageUrlLocal] = useState(user?.profile_image_url || gray_character);
 
   useEffect(() => {
-    fetchUser(); // 컴포넌트 마운트 시 사용자 정보 가져오기
-  }, []);
-  getUsers();
+    fetchUser();
+  }, [fetchUser]);
+
+  useEffect(() => {
+    setProfileImageUrlLocal(user?.profile_image_url || gray_character);
+  }, [user?.profile_image_url]);
 
   const theme = useTheme();
 
@@ -67,7 +69,9 @@ const ProfileSection: React.FC = () => {
         <ProfileEditModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
-          onEdit={() => console.log("Edit")}
+          onEdit={async (profileData) => {
+            await useUserStore.getState().updateProfile(profileData);
+          }}
         />
       </Card>
     </ProfileCard>

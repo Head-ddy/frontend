@@ -1,5 +1,5 @@
-import { prototypeUser } from '@mocks/prototypeData';
+import { getPrototypeUser, PrototypeUser } from '@mocks/prototypeStorage';
 
-export type User = typeof prototypeUser;
+export type User = PrototypeUser;
 
-export const getUsers = async (): Promise<User> => prototypeUser;
+export const getUsers = async (): Promise<User> => getPrototypeUser();

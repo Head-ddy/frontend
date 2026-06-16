@@ -19,6 +19,7 @@ export default defineConfig({
       '@layouts': path.resolve(__dirname, './src/layouts'),
       '@apis': path.resolve(__dirname, './src/apis'),
       '@types': path.resolve(__dirname, './src/types'),
+      '@mocks': path.resolve(__dirname, './src/mocks'),
     },
   },
 });

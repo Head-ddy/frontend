@@ -6,8 +6,6 @@ export const useSaveTipList = () => {
     queryKey: ["savedTips"],
     queryFn: () => getSavedTips(),
     initialPageParam: 1, 
-    getNextPageParam: (lastPage, allPages) => {
-      return lastPage.hasMore ? allPages.length + 1 : undefined;
-    },
+    getNextPageParam: () => undefined,
   });
 };

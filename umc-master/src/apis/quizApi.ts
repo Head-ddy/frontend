@@ -1,4 +1,4 @@
-import axiosInstance from './axios-instance';
+import { prototypeQuiz } from '@mocks/prototypeData';
 
 export interface QuizData {
   id: number;
@@ -28,20 +28,20 @@ export interface SubmitQuizResponse {
   };
 }
 
-export const fetchQuizData = async (): Promise<QuizResponse> => {
-  const response = await axiosInstance.get<QuizResponse>('/quizzes');
+export const fetchQuizData = async (): Promise<QuizResponse> => ({
+  isSuccess: true,
+  code: 'PROTOTYPE_QUIZ',
+  message: '프로토타입 퀴즈입니다.',
+  result: { response: { number_of_quiz: 1, quiz_list: [prototypeQuiz] } },
+});
 
-  if (!response?.data || !response.data.result) {
-    throw new Error('퀴즈 데이터가 없습니다.');
-  }
-
-  return response.data;
-};
-
-export const submitQuizAnswer = async (quizId: number, isCorrect: boolean): Promise<SubmitQuizResponse> => {
-  const response = await axiosInstance.post<SubmitQuizResponse>(`/quizzes/${quizId}`, {
-    isCorrect,
+export const submitQuizAnswer = async (_quizId: number, _isCorrect: boolean): Promise<SubmitQuizResponse> => {
+  void _quizId;
+  void _isCorrect;
+  return ({
+  isSuccess: true,
+  code: 'PROTOTYPE_SUBMIT',
+  message: '서버 없이 제출 처리되었습니다.',
+  result: { message: '프로토타입 제출 완료' },
   });
-
-  return response.data;
 };

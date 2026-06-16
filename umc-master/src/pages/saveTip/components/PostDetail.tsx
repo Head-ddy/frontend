@@ -22,7 +22,7 @@ export interface TipItem {
   content: string;
   createdAt: string;
   media: Media[];
-  hashtags: [];
+  hashtags: string[];
   user: User;
   likesCount: number;
   savesCount: number;

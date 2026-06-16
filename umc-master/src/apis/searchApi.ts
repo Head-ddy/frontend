@@ -1,4 +1,4 @@
-import axiosInstance from '@apis/axios-instance';
+import { prototypeTips } from '@mocks/prototypeData';
 
 export interface Author {
   userId: number;
@@ -43,21 +43,20 @@ export interface GetTipsParams {
   sort?: 'latest' | 'likes' | 'saves';
 }
 
-export const getSearchTips = async ({
-  query,
-  tags,
-  page,
-  limit,
-  sort = 'latest',
-}: GetTipsParams): Promise<TipsResponse> => {
-  const response = await axiosInstance.get<TipsResponse>('/tips/search', {
-    params: {
-      query,
-      hashtags: tags?.length ? tags.join(',') : undefined,
-      page,
-      limit,
-      sort,
-    },
+export const getSearchTips = async ({ query, tags, page, limit, sort = 'latest' }: GetTipsParams): Promise<TipsResponse> => {
+  const normalizedQuery = query?.trim().toLowerCase();
+  const filtered = prototypeTips.filter((tip) => {
+    const matchesQuery = !normalizedQuery || `${tip.title} ${tip.content}`.toLowerCase().includes(normalizedQuery);
+    const matchesTags = !tags?.length || tip.hashtags.some((tag) => tags.includes(tag.name));
+    return matchesQuery && matchesTags;
   });
-  return response.data;
+
+  const sorted = [...filtered].sort((a, b) => {
+    if (sort === 'likes') return b.likesCount - a.likesCount;
+    if (sort === 'saves') return b.savesCount - a.savesCount;
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+  });
+
+  const start = (page - 1) * limit;
+  return { isSuccess: true, message: '프로토타입 검색 결과입니다.', result: sorted.slice(start, start + limit) };
 };

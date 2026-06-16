@@ -8,14 +8,7 @@ const StartButton: React.FC<{ style?: CSSProperties }> = ({ style }) => {
   const navigate = useNavigate();
 
   const handleStartClick = () => {
-    // TODO: 로그인 이력(토큰)으로 판단할 예정
-    const token = localStorage.getItem('token');
-    console.log('랜딩페이지 토큰 유무: ', token);
-    if (token) {
-      navigate(RoutePaths.MAIN);
-    } else {
-      navigate(RoutePaths.LOGIN);
-    }
+    navigate(RoutePaths.MAIN);
   };
 
   return (

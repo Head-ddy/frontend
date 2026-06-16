@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import axiosInstance from '@apis/axios-instance';
+import { prototypeTips, prototypeUser } from '@mocks/prototypeData';
 
 interface GetTipsParams {
   pageParam: number;
@@ -14,67 +13,85 @@ export interface NewPost {
   imageUrls: File[];
 }
 
-export interface GetSavedParams {
-  page: number;
-}
+let tips = [...prototypeTips];
+
+const sortTips = (sorted: string) =>
+  [...tips].sort((a, b) => {
+    if (sorted === 'likes') return b.likesCount - a.likesCount;
+    if (sorted === 'saves') return b.savesCount - a.savesCount;
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+  });
+
 export const getTips = async ({ pageParam, sorted }: GetTipsParams) => {
-  const { data } = await axiosInstance.get(`/tips/sorted?page=${pageParam}&limit=5&sort=${sorted}`);
-  return data;
+  const pageSize = 5;
+  const sortedTips = sortTips(sorted);
+  const start = (pageParam - 1) * pageSize;
+  return {
+    isSuccess: true,
+    result: {
+      tips: sortedTips.slice(start, start + pageSize),
+      hasMore: start + pageSize < sortedTips.length,
+    },
+  };
 };
 
 export const createPost = async (newPost: NewPost): Promise<void> => {
-  try {
-    const formData = new FormData();
-
-    formData.append('title', newPost.title);
-    formData.append('content', newPost.content);
-    formData.append('hashtags', newPost.hashtags.join(','));
-
-    if (newPost.userId !== undefined) {
-      formData.append('userId', String(newPost.userId));
-    }
-    newPost.imageUrls.forEach((file) => {
-      formData.append('files', file);
-    });
-
-    await axiosInstance.post<void>('/tips', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
+  const now = new Date().toISOString();
+  tips = [
+    {
+      tipId: Date.now(),
+      title: newPost.title,
+      content: newPost.content,
+      createdAt: now,
+      updatedAt: now,
+      hashtags: newPost.hashtags.map((name, index) => ({ hashtagId: index + 100, name })),
+      imageUrls: [],
+      likesCount: 0,
+      savesCount: 0,
+      author: {
+        userId: prototypeUser.user_id,
+        nickname: prototypeUser.nickname,
+        profileImageUrl: prototypeUser.profile_image_url,
       },
-    });
-  } catch (error: any) {
-    if (error.response && error.response.data) {
-      throw new Error(`서버 에러: ${error.response.status} - ${error.response.data.message}`);
-    } else if (error.request) {
-      throw new Error('서버에 응답이 없습니다. (네트워크 문제일 수 있습니다)');
-    } else {
-      throw new Error(`요청 설정 에러: ${error.message}`);
-    }
-  }
+    },
+    ...tips,
+  ];
 };
 
-export const getSavedTips = async () => {
-  try {
-    const { data } = await axiosInstance.get(`/users/saved-tips`);
-    console.log('저장된 꿀팁 API 응답:', data.result);
-    return data.result;
-  } catch (error: any) {
-    console.error('저장된 꿀팁 API 에러 발생:', error.response?.status, error.response?.data);
-    throw new Error(`저장된 꿀팁 API 요청 실패: ${error.response?.status}`);
-  }
-};
+export const getSavedTips = async () =>
+  tips.slice(0, 5).map((tip) => ({
+    ...tip,
+    likeCount: tip.likesCount,
+    saveCount: tip.savesCount,
+  }));
 
 export const getTipDetail = async (tipId: number) => {
-  const { data } = await axiosInstance.get(`/tips/${tipId}`);
-  return data.result;
+  const tip = tips.find((item) => item.tipId === tipId) || tips[0];
+  return {
+    tipId: tip.tipId,
+    title: tip.title,
+    content: tip.content,
+    createdAt: tip.createdAt,
+    media: tip.imageUrls.map((image) => ({ mediaUrl: image.media_url, mediaType: image.media_type })),
+    hashtags: tip.hashtags.map((tag) => tag.name),
+    user: {
+      userId: tip.author.userId,
+      nickname: tip.author.nickname,
+      profileImageUrl: tip.author.profileImageUrl,
+    },
+    likesCount: tip.likesCount,
+    savesCount: tip.savesCount,
+    isLiked: false,
+    isBookmarked: false,
+  };
 };
 
-export const toggleLike = async (tipId: number) => {
-  const response = await axiosInstance.post(`/tips/${tipId}/like`);
-  return response.data;
+export const toggleLike = async (_tipId: number) => {
+  void _tipId;
+  return { isSuccess: true, message: '프로토타입 좋아요 토글' };
 };
 
-export const toggleBookmark = async (tipId: number) => {
-  const response = await axiosInstance.post(`/tips/${tipId}/bookmark`);
-  return response.data;
+export const toggleBookmark = async (_tipId: number) => {
+  void _tipId;
+  return { isSuccess: true, message: '프로토타입 북마크 토글' };
 };

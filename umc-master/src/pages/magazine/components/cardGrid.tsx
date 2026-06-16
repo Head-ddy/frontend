@@ -79,7 +79,7 @@ const CardGrid: React.FC<CardGridProps> = ({ cards }) => {
     <Container>
       <GridContainer>
         {updatedCards.map((card) => (
-          <GridItem key={card.id} columnSpan={card.columnSpan} onClick={() => handleClick(card.id)}>
+          <GridItem key={card.id} $columnSpan={card.columnSpan} onClick={() => handleClick(card.id)}>
             <Image src={card.image} alt={card.text} />
             <CardInfo text={card.text} likes={card.likes} bookmarks={card.bookmarks} date={card.date} />
           </GridItem>
@@ -104,10 +104,10 @@ const GridContainer = styled.div`
   align-items: start;
 `;
 
-const GridItem = styled.div<{ columnSpan: number }>`
+const GridItem = styled.div<{ $columnSpan: number }>`
   overflow: hidden;
   padding: 8px 4px;
-  grid-column: span ${({ columnSpan }) => columnSpan};
+  grid-column: span ${({ $columnSpan }) => $columnSpan};
   border-radius: 8px;
   cursor: pointer;
 `;

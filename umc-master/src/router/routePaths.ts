@@ -1,8 +1,5 @@
 const RoutePaths = Object.freeze({
   LANDING: '/',
-  LOGIN: '/login',
-  SIGNUP: '/signup',
-  FINDPRIVACY: '/find-privacy',
   MYPAGE: '/mypage',
   MAIN: '/main',
   SEARCH: '/search',
@@ -12,7 +9,6 @@ const RoutePaths = Object.freeze({
   COMMUNITY: '/community',
   MAGAZINE: '/magazine',
   MAGAZINE_DETAIL: '/magazine/:magazineId',
-  KAKAO_CALLBACK: '/oauth/kakao/callback',
   CHALLENGE: '/challenge',
   MYCHALLENGE: '/mychallenge',
   CHALLENGE_DETAIL: '/challenge/:id',

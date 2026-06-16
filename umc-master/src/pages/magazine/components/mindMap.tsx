@@ -21,27 +21,14 @@ const MindMap = () => {
     <MapContainer>
       <LineContainer xmlns="http://www.w3.org/2000/svg">
         {nodes.map((node, index) => (
-          <motion.line
+          <line
             key={index}
             x1="50%"
             y1="50%"
-            x2="50%"
-            y2="50%"
+            x2={node.x}
+            y2={node.y}
             stroke={theme.colors.text.lightGray}
-            strokeWidth="1" // 선 두께 추가
-            animate={{
-              // 노드와 선 정렬 맞추기 위해 계산산
-              x2: `calc(${node.x} + 2.5rem)`,
-              y2: `calc(${node.y} + 1rem)`,
-              pathLength: 1,
-              strokeDasharray: 100,
-              strokeDashoffset: 0,
-            }}
-            initial={{
-              pathLength: 0,
-              strokeDashoffset: 100,
-            }}
-            transition={{ duration: 1.5, delay: 0.3 * index }}
+            strokeWidth="1"
           />
         ))}
       </LineContainer>
@@ -63,7 +50,7 @@ const MindMap = () => {
           whileHover={{ scale: 1.2, x: 5, y: 5 }}
           transition={{ duration: 0.8, delay: index * 0.2, type: 'spring', stiffness: 200, damping: 10 }}
           style={{ left: nodes[index].x, top: nodes[index].y }}
-          color={nodes[index].color}
+          $color={nodes[index].color}
         >
           <Typography variant="bodyLarge">#{hashtag.name}</Typography>
         </Node>
@@ -95,9 +82,9 @@ const CenterNode = styled(motion.div)`
   z-index: 10;
 `;
 
-const Node = styled(motion.div)`
+const Node = styled(motion.div)<{ $color: string }>`
   position: absolute;
-  background: ${(props) => props.color};
+  background: ${({ $color }) => $color};
   color: ${({ theme }) => theme.colors.text.white};
   padding: 16px 42px;
   border-radius: 20px;

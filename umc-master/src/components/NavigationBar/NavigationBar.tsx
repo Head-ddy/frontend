@@ -9,14 +9,9 @@ import AlarmIcon from '@assets/icons/alarm.svg?react';
 import AlarmModal from '@components/Modal/alarm';
 import ProfileModal from '@components/Modal/profile';
 import { useUserStore } from '@store/userStore';
-import { getUsers } from '@apis/profileApi';
 import gray_character from '@assets/gray-character.png';
 
-interface NavigationBarProps {
-  login: boolean;
-}
-
-const NavigationBar: React.FC<NavigationBarProps> = ({ login }) => {
+const NavigationBar: React.FC = () => {
   const [isAlarmModalOpen, setIsAlarmModalOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const { user, fetchUser } = useUserStore();
@@ -24,7 +19,6 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ login }) => {
   useEffect(() => {
     fetchUser(); // 컴포넌트 마운트 시 사용자 정보 가져오기
   }, []);
-  getUsers();
 
   const handleNavClick = () => {
     window.scrollTo(0, 0);
@@ -58,20 +52,10 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ login }) => {
           </Typography>
         </LeftSection>
 
-        {login ? (
-          <UserSection>
-            <AlarmIcon onClick={toggleAlarmModal} />
-            <ProfileImg
-              src={user?.profile_image_url || gray_character}
-              alt="Profile Image"
-              onClick={toggleProfileModal}
-            />
-          </UserSection>
-        ) : (
-          <LoginBtn to={RoutePaths.LOGIN}>
-            <Typography variant="bodySmall">로그인</Typography>
-          </LoginBtn>
-        )}
+        <UserSection>
+          <AlarmIcon onClick={toggleAlarmModal} />
+          <ProfileImg src={user?.profile_image_url || gray_character} alt="Profile Image" onClick={toggleProfileModal} />
+        </UserSection>
       </Nav>
 
       <AlarmModal isOpen={isAlarmModalOpen} onClose={toggleAlarmModal} />
@@ -133,18 +117,6 @@ const StyledNavLink = styled(NavLink)`
 
   &.active {
     color: ${({ theme }) => theme.colors.primary[500]};
-  }
-`;
-
-const LoginBtn = styled(NavLink)`
-  background: ${({ theme }) => theme.colors.primary[500]};
-  color: ${({ theme }) => theme.colors.text.white};
-  padding: 7px 27px;
-  border-radius: 10px;
-  cursor: pointer;
-
-  &:hover {
-    background: ${({ theme }) => theme.colors.primary[600]};
   }
 `;
 

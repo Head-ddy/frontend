@@ -16,7 +16,7 @@ const CommentView: React.FC = () => {
   const { tipId } = useParams<{ tipId: string }>();
   const { user } = useUserStore();
 
-  const { data: comments, isLoading, error } = useComments(Number(tipId));
+  const { data: comments = [], isLoading, error } = useComments(Number(tipId));
   const addCommentMutation = useAddComment(Number(tipId));
   const deleteCommentMutation = useDeleteComment(Number(tipId));
   const updateCommentMutation = useUpdateComment(Number(tipId));

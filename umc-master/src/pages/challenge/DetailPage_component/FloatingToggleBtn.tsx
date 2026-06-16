@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
 import theme from '@styles/theme';
 import Typography from '@components/common/typography';
@@ -47,53 +47,22 @@ if (!detail) {
     }
   };
 
-  const realUrl = "https://umc-master-frontend.vercel.app"; // 실제 URL을 여기에 설정하세요
-  // const realUrl = window.location.href; // 현재 보고 있는 페이지의 URL
-  const loadKakaoSDK = () => {
-    const script = document.createElement("script");
-    script.src = "https://t1.kakaocdn.net/kakao_js_sdk/2.7.4/kakao.min.js";
-    script.integrity = import.meta.env.VITE_INTEGRITY_VALUE; // 환경 변수 사용
-    script.crossOrigin = "anonymous";
-    script.onload = () => {
-      console.log("Kakao SDK 로드 완료");
+  const shareUrl = window.location.href;
+
+  const sharePrototypeLink = async () => {
+    const shareData = {
+      title: '오늘의 꿀팁',
+      text: '오늘의 꿀팁을 보러 갈까요?',
+      url: shareUrl,
     };
-    document.head.appendChild(script);
-  };
-  
-  loadKakaoSDK();
-  
-  useEffect(() => {
-      if (!window.Kakao) return;
-      if (!window.Kakao.isInitialized()) {
-        window.Kakao.init(`${import.meta.env.VITE_JAVASCRIPT_KEY}`); // 여기에 카카오 앱 키를 넣어주세요
-      }
-  }, []);
-  const shareKakao = () => {
-    
-      if (!window.Kakao) {
-          console.error("Kakao SDK가 로드되지 않았습니다.");
-          return;
-      }
-      window.Kakao.Share.sendDefault({
-          objectType: "feed",
-          content: {
-              title: "오늘의 꿀팁",
-              description: "오늘의 꿀팁을 보러 갈까요?",
-              imageUrl:
-                  "https://mud-kage.kakao.com/dn/NTmhS/btqfEUdFAUf/FjKzkZsnoeE4o19klTOVI1/openlink_640x640s.jpg",
-              link: {
-                  mobileWebUrl: realUrl,
-              },
-          },
-          buttons: [
-              {
-                  title: "나도 꿀팁 보러가기",
-                  link: {
-                      mobileWebUrl: realUrl,
-                  },
-              },
-          ],
-      });
+
+    if (navigator.share) {
+      await navigator.share(shareData);
+      return;
+    }
+
+    await navigator.clipboard?.writeText(shareUrl);
+    alert('프로토타입 링크가 복사되었습니다.');
   };
 
   return (
@@ -111,7 +80,7 @@ if (!detail) {
         </Typography>
       </InteractionBtn>
       <InteractionBtn>
-        <BtnImg src={Link} alt="공유하기" onClick={shareKakao} />
+        <BtnImg src={Link} alt="공유하기" onClick={sharePrototypeLink} />
         <Typography variant="bodyXSmall" style={{ color: theme.colors.text.lightGray }}>
           공유하기
         </Typography>

@@ -1,46 +1,33 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import axiosInstance from './axios-instance';
+import { prototypeComments, prototypeUser } from '@mocks/prototypeData';
 
-export const getComments = async (tipId: number) => {
-  try {
-    const { data } = await axiosInstance.get('/comments');
-    return data.result.filter((comment: any) => comment.tips_id === tipId);
-  } catch (error: any) {
-    console.error('댓글 불러오기 실패:', error);
-    throw new Error('댓글을 불러오는 데 실패했습니다.');
-  }
-};
+let comments = [...prototypeComments];
+
+export const getComments = async (tipId: number) => comments.filter((comment) => comment.tips_id === tipId);
 
 export const addComment = async (tipId: string, comment: string) => {
-  try {
-    const { data } = await axiosInstance.post(`/tips/${tipId}/comments`, {
-      comment,
-    });
-    return data;
-  } catch (error: any) {
-    console.error('댓글 추가 실패:', error);
-    throw new Error('댓글 추가에 실패했습니다.');
-  }
+  const newComment = {
+    comment_id: Date.now(),
+    tips_id: Number(tipId),
+    user: {
+      user_id: prototypeUser.user_id,
+      nickname: prototypeUser.nickname,
+      profileImageUrl: prototypeUser.profile_image_url,
+    },
+    comment,
+    created_at: new Date().toISOString(),
+  };
+  comments = [newComment, ...comments];
+  return { isSuccess: true, result: newComment };
 };
 
-export const editComment = async (tipId: string, commentId: string, newComment: string) => {
-  try {
-    const { data } = await axiosInstance.put(`/tips/${tipId}/comments/${commentId}`, {
-      comment: newComment,
-    });
-    return data;
-  } catch (error: any) {
-    console.error('댓글 수정 실패:', error);
-    throw new Error('댓글 수정에 실패했습니다.');
-  }
+export const editComment = async (_tipId: string, commentId: string, newComment: string) => {
+  comments = comments.map((comment) =>
+    comment.comment_id === Number(commentId) ? { ...comment, comment: newComment } : comment
+  );
+  return { isSuccess: true };
 };
 
-export const deleteComment = async (tipId: string, commentId: string) => {
-  try {
-    const { data } = await axiosInstance.delete(`/tips/${tipId}/comments/${commentId}`);
-    return data;
-  } catch (error: any) {
-    console.error('댓글 삭제 실패:', error);
-    throw new Error('댓글 삭제에 실패했습니다.');
-  }
+export const deleteComment = async (_tipId: string, commentId: string) => {
+  comments = comments.filter((comment) => comment.comment_id !== Number(commentId));
+  return { isSuccess: true };
 };

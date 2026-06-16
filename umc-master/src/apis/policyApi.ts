@@ -1,5 +1,6 @@
-import axiosInstance from '@apis/axios-instance';
 import { PolicyData } from '@pages/magazine/components/cardGrid';
+import { prototypeHashtags, prototypePolicies } from '@mocks/prototypeData';
+
 interface GetPoliciesParams {
   locationId: number;
 }
@@ -11,7 +12,7 @@ export interface Policy {
   created_at: string;
   updated_at: string;
   policy_url: string;
-  image_url_list: [];
+  image_url_list: string;
   magazine_likes: number;
   magazine_bookmarks: number;
   organization: {
@@ -49,33 +50,37 @@ export interface Hashtag {
   popularity: number;
 }
 
-export const getPolicies = async ({ locationId }: GetPoliciesParams): Promise<PolicyData[]> => {
-  const { data } = await axiosInstance.get(`/policies?location_id=${locationId}`);
-  return data.result.policy_list;
+export const getPolicies = async (_params: GetPoliciesParams): Promise<PolicyData[]> => {
+  void _params;
+  return prototypePolicies;
 };
 
-export const getPolicyGuide = async ({ policyId }: { policyId: number }): Promise<Policy> => {
-  const { data } = await axiosInstance.get(`/policies/${policyId}/guide`);
-  return data.result;
-};
+export const getPolicyGuide = async ({ policyId }: { policyId: number }): Promise<Policy> =>
+  (prototypePolicies.find((policy) => policy.id === policyId) || prototypePolicies[0]) as Policy;
 
-export const createPolicy = async (data: CreatePolicyParams): Promise<Policy> => {
-  const response = await axiosInstance.post(`/policies`, data);
-  return response.data.result;
-};
+export const createPolicy = async (data: CreatePolicyParams): Promise<Policy> => ({
+  ...(prototypePolicies[0] as Policy),
+  id: Date.now(),
+  title: data.title,
+  description: data.description,
+  policy_url: data.policy_url,
+});
 
 export const updatePolicy = async ({ policyId, data }: PolicyMutationParams): Promise<Policy> => {
-  const response = await axiosInstance.patch(`/policies/${policyId}`, data);
-  return response.data.result;
+  const policy = (prototypePolicies.find((item) => item.id === policyId) || prototypePolicies[0]) as Policy;
+  return {
+    ...policy,
+    title: data.title,
+    description: data.description,
+    policy_url: data.policy_url,
+    image_url_list: data.image_url_list[0] || policy.image_url_list,
+  };
 };
 
-export const deletePolicy = async ({ policyId }: { policyId: number }): Promise<boolean> => {
-  const response = await axiosInstance.delete(`/policies/${policyId}`);
-  return response.data.isSuccess;
+export const deletePolicy = async (_params: { policyId: number }): Promise<boolean> => {
+  void _params;
+  return true;
 };
 
-// 인기 관심사 조회 (기본값 6개)
-export const getPopularHashtags = async ({ limit }: { limit: number }): Promise<Hashtag[]> => {
-  const response = await axiosInstance.get(`/hashtags/popular?limit=${limit}`);
-  return response.data.result;
-};
+export const getPopularHashtags = async ({ limit }: { limit: number }): Promise<Hashtag[]> =>
+  prototypeHashtags.slice(0, limit);

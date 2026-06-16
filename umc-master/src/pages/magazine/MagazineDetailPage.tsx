@@ -48,7 +48,7 @@ const MagazineDetailPage: React.FC = () => {
           <ProfileImage
             src={data?.organization.image || '/default-profile.png'}
             alt={data?.organization.name}
-            hasImage={!!data?.organization.image}
+            $hasImage={!!data?.organization.image}
           />
           <Author>
             <Typography variant="titleXxSmall">{data?.organization.name}</Typography>
@@ -102,13 +102,13 @@ const AuthorContainer = styled.div`
   margin-bottom: 32px;
 `;
 
-const ProfileImage = styled.img<{ hasImage: boolean }>`
+const ProfileImage = styled.img<{ $hasImage: boolean }>`
   width: 60px;
   height: 60px;
   border-radius: 50%;
   object-fit: cover;
-  background-color: ${({ hasImage, theme }) => (hasImage ? theme.colors.text.white : theme.colors.text.lightGray)};
-  box-shadow: ${({ hasImage }) => (hasImage ? '0px 4px 10px rgba(0, 0, 0, 0.15)' : 'none')};
+  background-color: ${({ $hasImage, theme }) => ($hasImage ? theme.colors.text.white : theme.colors.text.lightGray)};
+  box-shadow: ${({ $hasImage }) => ($hasImage ? '0px 4px 10px rgba(0, 0, 0, 0.15)' : 'none')};
 `;
 
 const Author = styled.div`

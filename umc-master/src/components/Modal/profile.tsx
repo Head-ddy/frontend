@@ -4,12 +4,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import CloseIcon from '@assets/icons/close.svg?react';
 import UserIcon from '@assets/icons/user.svg?react';
 import TipIcon from '@assets/icons/tip.svg?react';
-import LogoutIcon from '@assets/icons/logout.svg?react';
 import Typography from '@components/common/typography';
 import theme from '@styles/theme';
-import { useAuthStore } from '@store/authStore';
 import { useUserStore } from '@store/userStore';
-import { getUsers } from '@apis/profileApi';
 
 interface ProfileModalProps {
   isOpen: boolean;
@@ -20,18 +17,11 @@ interface ProfileModalProps {
 const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, profileImage }) => {
   if (!isOpen) return null;
   const navigate = useNavigate();
-  const { clearAuth } = useAuthStore();
   const { user, fetchUser } = useUserStore();
 
   useEffect(() => {
     fetchUser();
   }, []);
-  getUsers();
-
-  const handleLogout = () => {
-    clearAuth();
-    navigate('/');
-  };
 
   return (
     <ModalWrapper onClick={onClose}>
@@ -53,11 +43,11 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, profileIma
             </MenuItem>
             <MenuItem
               onClick={() => {
-                handleLogout();
+                navigate('/');
                 onClose();
               }}
             >
-              <LogoutIcon /> 로그아웃
+              프로토타입 홈으로
             </MenuItem>
           </Typography>
         </MenuList>

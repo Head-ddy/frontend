@@ -61,7 +61,7 @@ const ProfileSection: React.FC = () => {
               style={{color: theme.colors.text.black}}
             >님 오늘도 반가워요!</Typography>
           </Hello>
-          <LoginType>카카오 로그인</LoginType>
+          <LoginType>프로토타입 계정</LoginType>
         </Text>
         <ProfileEdit onClick={() => setIsModalOpen(true)}>프로필 변경</ProfileEdit>
         <ProfileEditModal
